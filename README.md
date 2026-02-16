@@ -22,7 +22,17 @@
 
 ## Getting Started
 
-<!-- Setup instructions go here -->
+### Environment Setup
+
+This project uses environment variables for configuration. Copy the example file and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+See [`.env.example`](.env.example) for all available configuration options and their descriptions.
+
+<!-- Full setup instructions go here -->
 
 ## Contributing
 
