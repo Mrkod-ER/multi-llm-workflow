@@ -1,0 +1,12 @@
+version: "3.9"
+
+# ================================================
+# Multi-LLM Workflow Builder — Docker Compose
+# ================================================
+# Services will be added incrementally:
+#   - backend  (FastAPI)
+#   - frontend (React)
+#   - redis    (Shared Memory)
+#   - ollama   (Local LLM Runtime)
+
+services: {}
