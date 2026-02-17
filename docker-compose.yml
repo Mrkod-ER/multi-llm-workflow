@@ -3,11 +3,6 @@ version: "3.9"
 # ================================================
 # Multi-LLM Workflow Builder — Docker Compose
 # ================================================
-# Services will be added incrementally:
-#   - backend  (FastAPI)
-#   - frontend (React)
-#   - redis    (Shared Memory)
-#   - ollama   (Local LLM Runtime)
 
 services:
 
@@ -42,6 +37,32 @@ services:
     depends_on:
       - backend
 
+  redis:
+    image: redis:7-alpine
+    container_name: mlw_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mlw_network
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: mlw_ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - mlw_network
+
 networks:
   mlw_network:
     driver: bridge
+
+volumes:
+  redis_data:
+  ollama_data:
