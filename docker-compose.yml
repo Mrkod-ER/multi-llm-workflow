@@ -25,3 +25,23 @@ services:
       - ./backend:/app
     networks:
       - mlw_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mlw_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - mlw_network
+    depends_on:
+      - backend
+
+networks:
+  mlw_network:
+    driver: bridge
