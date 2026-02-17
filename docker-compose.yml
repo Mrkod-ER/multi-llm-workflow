@@ -9,4 +9,19 @@ version: "3.9"
 #   - redis    (Shared Memory)
 #   - ollama   (Local LLM Runtime)
 
-services: {}
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mlw_backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app
+    networks:
+      - mlw_network
