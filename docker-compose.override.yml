@@ -1,0 +1,21 @@
+# docker-compose.override.yml
+# ================================================
+# Local development overrides for docker-compose.yml
+# This file is automatically merged by Docker Compose
+# when you run `docker compose up`
+# ================================================
+
+version: "3.9"
+
+services:
+
+  backend:
+    environment:
+      - DEBUG=true
+      - LOG_LEVEL=debug
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8000
