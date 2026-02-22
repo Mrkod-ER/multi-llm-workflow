@@ -21,6 +21,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("Shutting down backend...")
 
 from app.config import get_settings
+from app.exceptions import setup_exception_handlers
+from app.middleware import setup_middlewares
 
 app = FastAPI(
     title="Multi-LLM Workflow Builder",
@@ -31,6 +33,9 @@ app = FastAPI(
 
 settings = get_settings()
 
+# Setup custom middlewares (request id, etc)
+setup_middlewares(app)
+
 # CORS Middleware setup
 app.add_middleware(
     CORSMiddleware,
@@ -39,6 +44,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Setup exception handlers
+setup_exception_handlers(app)
 
 @app.get("/health", tags=["System"])
 async def health_check() -> JSONResponse:
