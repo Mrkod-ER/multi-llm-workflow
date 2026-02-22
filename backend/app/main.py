@@ -20,6 +20,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
     logger.info("Shutting down backend...")
 
+from app.config import get_settings
+
 app = FastAPI(
     title="Multi-LLM Workflow Builder",
     description="Backend API for orchestrating multi-LLM workflows",
@@ -27,10 +29,12 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+settings = get_settings()
+
 # CORS Middleware setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Will be configured via settings later
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
