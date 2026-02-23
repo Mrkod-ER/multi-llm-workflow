@@ -6,8 +6,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-# Setup simple logger for now
-logging.basicConfig(level=logging.INFO)
+from app.logger import setup_logging
+
+# Setup structured logging
+setup_logging()
 logger = logging.getLogger(__name__)
 
 @contextlib.asynccontextmanager
