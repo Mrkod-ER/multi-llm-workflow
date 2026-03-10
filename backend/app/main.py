@@ -50,6 +50,10 @@ app.add_middleware(
 # Setup exception handlers
 setup_exception_handlers(app)
 
+# Register API routers
+from app.api.v1 import api_v1_router  # noqa: E402
+app.include_router(api_v1_router)
+
 @app.get("/health", tags=["System"])
 async def health_check() -> JSONResponse:
     """
