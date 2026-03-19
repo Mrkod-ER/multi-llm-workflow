@@ -11,38 +11,100 @@
 
 ## Overview
 
-<!-- Project description goes here -->
+Multi-LLM Workflow Builder lets you chain multiple AI language models together in a visual graph — routing prompts through different models, merging outputs, and building sophisticated AI pipelines without code.
 
 ## Features
 
-<!-- Feature list goes here -->
+- 🔀 **Visual DAG Builder** — Drag-and-drop canvas powered by React Flow
+- 🤖 **Multi-Provider Support** — OpenAI (GPT-4o), Ollama (local), and a Mock provider for testing
+- ⚡ **Real-time Execution** — Run workflows and watch results stream node-by-node
+- 🐳 **Self-Hostable** — One-command Docker Compose setup with Ollama, Redis, and the full stack
+- 🔒 **Secure by Default** — API keys stored in environment variables, never in code
+- 📡 **REST API** — Full OpenAPI spec available at `/api/v1/docs/swagger`
 
 ## Architecture
 
-<!-- Architecture diagram goes here -->
+```
+┌─────────────────────────────────────────────────────┐
+│   Browser (Next.js 14 + React Flow)                 │
+│   Visual DAG Builder + Properties Panel             │
+└───────────────────┬─────────────────────────────────┘
+                    │ REST / WebSocket
+┌───────────────────▼─────────────────────────────────┐
+│   FastAPI Backend                                   │
+│   ┌──────────┐  ┌──────────┐  ┌──────────────────┐  │
+│   │ Workflow  │  │  Engine  │  │  Provider Layer  │  │
+│   │  Router  │→ │ DAG Sort │→ │ OpenAI / Ollama  │  │
+│   └──────────┘  └──────────┘  └──────────────────┘  │
+└───────────────────┬─────────────────────────────────┘
+        ┌───────────┼───────────┐
+┌───────▼──┐  ┌─────▼────┐  ┌──▼──────────┐
+│  Redis   │  │  Ollama  │  │  OpenAI API │
+│ (Memory) │  │ (Local)  │  │  (Cloud)    │
+└──────────┘  └──────────┘  └─────────────┘
+```
 
 ## Tech Stack
 
-<!-- Tech stack table goes here -->
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 14, TypeScript, React Flow, Zustand, Tailwind CSS |
+| Backend | FastAPI, Python 3.11, Pydantic v2, Uvicorn |
+| LLM Providers | Ollama (local), OpenAI via LiteLLM |
+| Memory | Redis |
+| Infrastructure | Docker, Docker Compose, GitHub Actions |
 
 ## Getting Started
 
-### Environment Setup
+### Prerequisites
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose
+- (Optional) An OpenAI API key for cloud models
+- (Optional) A GPU for running large local models via Ollama
 
-This project uses environment variables for configuration. Copy the example file and fill in your values:
+### Quick Start
 
 ```bash
+# 1. Clone the repository
+git clone https://github.com/Mrkod-ER/multi-llm-workflow.git
+cd multi-llm-workflow
+
+# 2. Configure environment
 cp .env.example .env
+# Edit .env with your API keys
+
+# 3. Start the full stack
+make up
+
+# 4. Open the app
+open http://localhost:3000
 ```
 
-See [`.env.example`](.env.example) for all available configuration options and their descriptions.
+### Development (Hot Reload)
 
-<!-- Full setup instructions go here -->
+```bash
+make dev
+```
+
+### Pull a Local Model (Ollama)
+
+```bash
+make pull-model MODEL=llama3
+make pull-model MODEL=mistral
+```
+
+### Useful Commands
+
+```bash
+make logs          # View all logs
+make ps            # Show container status
+make test          # Run backend tests
+make clean         # Remove all containers + volumes
+```
 
 ## Contributing
 
-<!-- Contribution guide goes here -->
+See [CONTRIBUTING.md](CONTRIBUTING.md) for branch strategy, commit conventions, and PR guidelines.
 
 ## License
 
-<!-- License info goes here -->
+MIT — see [LICENSE](LICENSE) for details.
