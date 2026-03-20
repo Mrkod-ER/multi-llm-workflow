@@ -33,9 +33,12 @@ interface WorkflowState {
   isRunning: boolean;
   runResult: WorkflowRunResponse | null;
   executingNodeId: string | null;
+  nodeStatuses: Record<string, "idle" | "running" | "success" | "error">;
   setIsRunning: (v: boolean) => void;
   setRunResult: (result: WorkflowRunResponse | null) => void;
   setExecutingNodeId: (id: string | null) => void;
+  setNodeStatus: (nodeId: string, status: "idle" | "running" | "success" | "error") => void;
+  resetNodeStatuses: () => void;
 
   // Models
   models: ModelInfo[];
@@ -80,6 +83,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   isRunning: false,
   runResult: null,
   executingNodeId: null,
+  nodeStatuses: {},
   models: [],
 
   onNodesChange: (changes) =>
@@ -138,5 +142,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   setIsRunning: (v) => set({ isRunning: v }),
   setRunResult: (result) => set({ runResult: result }),
   setExecutingNodeId: (id) => set({ executingNodeId: id }),
+  setNodeStatus: (nodeId, status) =>
+    set((state) => ({ nodeStatuses: { ...state.nodeStatuses, [nodeId]: status } })),
+  resetNodeStatuses: () => set({ nodeStatuses: {} }),
   setModels: (models) => set({ models }),
 }));
