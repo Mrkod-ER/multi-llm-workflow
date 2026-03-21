@@ -1,23 +1,39 @@
 "use client";
-import { useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import {
   ReactFlow,
   Background,
   BackgroundVariant,
   Controls,
   MiniMap,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { InputNode } from "@/components/nodes/InputNode";
 import { LLMNode } from "@/components/nodes/LLMNode";
 import { OutputNode } from "@/components/nodes/OutputNode";
+import { AnimatedDataEdge } from "@/components/edges/AnimatedDataEdge";
+import { CanvasContextMenu } from "@/components/CanvasContextMenu";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useAutoLayout } from "@/hooks/useAutoLayout";
 
 const nodeTypes = {
   inputNode: InputNode,
   llmNode: LLMNode,
   outputNode: OutputNode,
 };
+
+const edgeTypes = {
+  animatedData: AnimatedDataEdge,
+};
+
+interface ContextMenuState {
+  screenX: number;
+  screenY: number;
+  canvasX: number;
+  canvasY: number;
+}
 
 export function WorkflowCanvas() {
   const {
@@ -29,6 +45,12 @@ export function WorkflowCanvas() {
     setSelectedNodeId,
   } = useWorkflowStore();
 
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+  const { screenToFlowPosition } = useReactFlow();
+
+  // Register keyboard shortcuts
+  useKeyboardShortcuts();
+
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: { id: string }) => {
       setSelectedNodeId(node.id);
@@ -38,10 +60,20 @@ export function WorkflowCanvas() {
 
   const onPaneClick = useCallback(() => {
     setSelectedNodeId(null);
+    setContextMenu(null);
   }, [setSelectedNodeId]);
 
+  const onPaneContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const canvasPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      setContextMenu({ screenX: e.clientX, screenY: e.clientY, canvasX: canvasPos.x, canvasY: canvasPos.y });
+    },
+    [screenToFlowPosition]
+  );
+
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -50,12 +82,14 @@ export function WorkflowCanvas() {
         onConnect={onConnect}
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
+        onPaneContextMenu={onPaneContextMenu}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         defaultEdgeOptions={{
-          animated: false,
-          style: { strokeWidth: 2, stroke: "rgba(148,100,255,0.5)" },
+          type: "animatedData",
+          style: { strokeWidth: 2 },
         }}
         connectionLineStyle={{ stroke: "rgba(148,100,255,0.8)", strokeWidth: 2 }}
         proOptions={{ hideAttribution: true }}
@@ -77,6 +111,16 @@ export function WorkflowCanvas() {
           style={{ height: 100 }}
         />
       </ReactFlow>
+
+      {contextMenu && (
+        <CanvasContextMenu
+          x={contextMenu.screenX}
+          y={contextMenu.screenY}
+          canvasX={contextMenu.canvasX}
+          canvasY={contextMenu.canvasY}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
     </div>
   );
 }
