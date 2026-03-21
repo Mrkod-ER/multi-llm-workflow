@@ -1,13 +1,15 @@
 "use client";
 import { useState } from "react";
-import { Play, Loader2, CheckCircle2, XCircle, Plus, FileText, BrainCircuit, MonitorPlay, GitBranch } from "lucide-react";
+import { Play, Loader2, CheckCircle2, XCircle, Plus, FileText, BrainCircuit, MonitorPlay, GitBranch, LayoutTemplate, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { NodeType, type WorkflowRunResponse } from "@/lib/types";
 import { api } from "@/lib/api";
+import { useAutoLayout } from "@/hooks/useAutoLayout";
 
-export function Topbar() {
+export function Topbar({ onShowResults }: { onShowResults: () => void }) {
   const { nodes, edges, addNode, setIsRunning, isRunning, setRunResult, setExecutingNodeId } = useWorkflowStore();
+  const { applyLayout } = useAutoLayout();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
   const handleRun = async () => {
@@ -41,8 +43,10 @@ export function Topbar() {
       });
       setRunResult(result);
       setStatus(result.status === "success" ? "success" : "error");
+      onShowResults();
     } catch {
       setStatus("error");
+      onShowResults();
     } finally {
       setIsRunning(false);
       setExecutingNodeId(null);
@@ -101,6 +105,29 @@ export function Topbar() {
             <XCircle size={13} />
             <span>Run failed</span>
           </div>
+        )}
+
+        {/* Auto Layout */}
+        <button
+          id="auto-layout-btn"
+          onClick={applyLayout}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-all"
+          title="Auto-arrange nodes"
+        >
+          <LayoutTemplate size={12} />
+          Auto Layout
+        </button>
+
+        {/* View Results */}
+        {runResult && (
+          <button
+            id="view-results-btn"
+            onClick={onShowResults}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-violet-300 hover:text-white bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 transition-all"
+          >
+            <BarChart2 size={12} />
+            Results
+          </button>
         )}
 
         {/* Run button */}
