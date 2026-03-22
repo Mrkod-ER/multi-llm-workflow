@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 import { useAutoLayout } from "@/hooks/useAutoLayout";
 
 export function Topbar({ onShowResults }: { onShowResults: () => void }) {
-  const { nodes, edges, addNode, setIsRunning, isRunning, setRunResult, setExecutingNodeId } = useWorkflowStore();
+  const { nodes, edges, addNode, setIsRunning, isRunning, setRunResult, setExecutingNodeId, runResult } = useWorkflowStore();
   const { applyLayout } = useAutoLayout();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 

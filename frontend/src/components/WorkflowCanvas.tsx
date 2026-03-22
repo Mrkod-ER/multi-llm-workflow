@@ -64,10 +64,12 @@ export function WorkflowCanvas() {
   }, [setSelectedNodeId]);
 
   const onPaneContextMenu = useCallback(
-    (e: React.MouseEvent) => {
+    (e: React.MouseEvent | MouseEvent) => {
       e.preventDefault();
-      const canvasPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-      setContextMenu({ screenX: e.clientX, screenY: e.clientY, canvasX: canvasPos.x, canvasY: canvasPos.y });
+      const clientX = "clientX" in e ? e.clientX : 0;
+      const clientY = "clientY" in e ? e.clientY : 0;
+      const canvasPos = screenToFlowPosition({ x: clientX, y: clientY });
+      setContextMenu({ screenX: clientX, screenY: clientY, canvasX: canvasPos.x, canvasY: canvasPos.y });
     },
     [screenToFlowPosition]
   );
