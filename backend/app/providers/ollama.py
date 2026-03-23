@@ -1,5 +1,6 @@
 import httpx
 import logging
+from typing import AsyncGenerator
 from app.providers.base import BaseLLMProvider
 from app.providers.schema import LLMRequest, LLMResponse
 from app.config import get_settings
@@ -57,6 +58,39 @@ class OllamaProvider(BaseLLMProvider):
         except httpx.RequestError as e:
             logger.error(f"Ollama Network Error: {e}")
             raise WorkflowError(f"Ollama local provider request failed: {e}")
+
+    async def generate_stream(self, request: LLMRequest) -> AsyncGenerator[str, None]:
+        import json
+        logger.info(f"OllamaProvider: Streaming from {self.base_url} with model {request.model}")
+        
+        url = f"{self.base_url}/api/chat"
+        api_messages = [{"role": msg.role, "content": msg.content} for msg in request.messages]
+        
+        payload = {
+            "model": request.model,
+            "messages": api_messages,
+            "stream": True,
+            "options": {
+                "temperature": request.temperature
+            }
+        }
+        
+        try:
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                async with client.stream("POST", url, json=payload) as resp:
+                    resp.raise_for_status()
+                    async for line in resp.aiter_lines():
+                        if line:
+                            try:
+                                data = json.loads(line)
+                                content = data.get("message", {}).get("content")
+                                if content:
+                                    yield content
+                            except json.JSONDecodeError:
+                                pass
+        except httpx.RequestError as e:
+            logger.error(f"Ollama Streaming Network Error: {e}")
+            raise WorkflowError(f"Ollama local provider stream failed: {e}")
 
     async def health_check(self) -> bool:
         url = f"{self.base_url}/api/tags"
