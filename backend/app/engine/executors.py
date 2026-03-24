@@ -7,11 +7,14 @@ from app.engine.memory import MemoryStore
 
 logger = logging.getLogger(__name__)
 
+import asyncio
+
 class ExecutionContext:
     """Context object passed to every node executor during execution."""
-    def __init__(self, memory: MemoryStore, workflow_id: str):
+    def __init__(self, memory: MemoryStore, workflow_id: str, stream_queue: asyncio.Queue = None):
         self.memory = memory
         self.workflow_id = workflow_id
+        self.stream_queue = stream_queue
 
 
 class BaseNodeExecutor(ABC):
@@ -53,6 +56,9 @@ class OutputNodeExecutor(BaseNodeExecutor):
         return {"status": "completed"}
 
 
+from app.providers.factory import ProviderFactory
+from app.providers.schema import LLMRequest, ChatMessage, LLMProviderType
+
 class LLMNodeExecutor(BaseNodeExecutor):
     """Executes an LLM node, calling the appropriate provider layer."""
     
@@ -63,16 +69,42 @@ class LLMNodeExecutor(BaseNodeExecutor):
         model_name = node.data.model
         provider_name = node.data.provider
         
-        # We will stub the actual LLM call here heavily until Phase 5 
-        # where we implement the LLM Provider abstractions.
-        # For now, it just mocks finding inputs from memory.
+        # Build messages based on incoming connections in a real scenario
+        # For now, we take a placeholder user prompt logic, maybe from the engine
+        # Here we just execute the stream.
+        messages = []
+        if system_prompt:
+            messages.append(ChatMessage(role="system", content=system_prompt))
+            
+        # Get edges targeting this node to retrieve their outputs from memory
+        # In a generic way, we could append memory outputs. For MVP, we pass dummy text or what's in memory.
+        # Check if there is an input in memory
+        input_texts = [val for key, val in context.memory.store.items() if key != node.id]
+        if input_texts:
+            messages.append(ChatMessage(role="user", content=" ".join(str(x) for x in input_texts)))
+        else:
+            messages.append(ChatMessage(role="user", content="Hello!")) # Fallback
+            
+        provider = ProviderFactory.get_provider(LLMProviderType(provider_name))
         
-        logger.debug(f"LLM Call stub: Provider={provider_name}, Model={model_name}")
+        request = LLMRequest(
+            provider=LLMProviderType(provider_name),
+            model=model_name,
+            messages=messages
+        )
         
-        # Simulated LLM generation based on inputs
-        generated_output = f"Simulated response from {model_name}"
+        generated_output = ""
+        
+        async for chunk in provider.generate_stream(request):
+            generated_output += chunk
+            if context.stream_queue:
+                await context.stream_queue.put({
+                    "type": "node_chunk",
+                    "node_id": node.id,
+                    "content": chunk
+                })
+        
         context.memory.write(key=node.id, value=generated_output)
-        
         return generated_output
 
 
