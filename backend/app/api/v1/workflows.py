@@ -1,8 +1,9 @@
 import logging
 import uuid
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 from app.schemas.api import WorkflowRunRequest, WorkflowRunResponse, WorkflowValidationError
 from app.schemas.workflow import Workflow
@@ -73,3 +74,37 @@ async def run_workflow(request: WorkflowRunRequest):
     except Exception as e:
         logger.exception(f"Unhandled error during workflow run {workflow_id}: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred during workflow execution.")
+
+@router.websocket("/ws/run")
+async def ws_run_workflow(websocket: WebSocket):
+    """
+    WebSocket endpoint for real-time workflow execution.
+    Expects a WorkflowRunRequest JSON payload upon connection.
+    Streams execution events (node_start, node_chunk, node_end, error, workflow_end).
+    """
+    await websocket.accept()
+    logger.info("WebSocket connected for workflow run stream")
+    
+    try:
+        data = await websocket.receive_json()
+        request = WorkflowRunRequest(**data)
+        workflow_id = str(uuid.uuid4())
+        
+        runner = WorkflowRunner(request)
+        async for event in runner.run_stream(workflow_id=workflow_id):
+            await websocket.send_json(event)
+            
+    except WebSocketDisconnect:
+        logger.info("WebSocket disconnected by client")
+    except ValidationError as e:
+        logger.error(f"WebSocket validaton error: {e}")
+        await websocket.send_json({"type": "error", "error": "Invalid workflow payload"})
+        await websocket.close(code=1008) # Policy Violation
+    except Exception as e:
+        logger.exception(f"WebSocket unhandled error: {e}")
+        await websocket.send_json({"type": "error", "error": str(e)})
+        # It may be already closed, but we try
+        try:
+            await websocket.close(code=1011) # Internal Error
+        except Exception:
+            pass
