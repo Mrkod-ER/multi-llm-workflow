@@ -34,11 +34,14 @@ interface WorkflowState {
   runResult: WorkflowRunResponse | null;
   executingNodeId: string | null;
   nodeStatuses: Record<string, "idle" | "running" | "success" | "error">;
+  streamingTexts: Record<string, string>;
   setIsRunning: (v: boolean) => void;
   setRunResult: (result: WorkflowRunResponse | null) => void;
   setExecutingNodeId: (id: string | null) => void;
   setNodeStatus: (nodeId: string, status: "idle" | "running" | "success" | "error") => void;
   resetNodeStatuses: () => void;
+  appendStreamingText: (nodeId: string, text: string) => void;
+  resetStreamingTexts: () => void;
 
   // Models
   models: ModelInfo[];
@@ -84,6 +87,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   runResult: null,
   executingNodeId: null,
   nodeStatuses: {},
+  streamingTexts: {},
   models: [],
 
   onNodesChange: (changes) =>
@@ -145,5 +149,13 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   setNodeStatus: (nodeId, status) =>
     set((state) => ({ nodeStatuses: { ...state.nodeStatuses, [nodeId]: status } })),
   resetNodeStatuses: () => set({ nodeStatuses: {} }),
+  appendStreamingText: (nodeId, text) =>
+    set((state) => ({
+      streamingTexts: {
+        ...state.streamingTexts,
+        [nodeId]: (state.streamingTexts[nodeId] || "") + text,
+      },
+    })),
+  resetStreamingTexts: () => set({ streamingTexts: {} }),
   setModels: (models) => set({ models }),
 }));
