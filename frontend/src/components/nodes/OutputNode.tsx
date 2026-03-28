@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 import { useWorkflowStore } from "@/store/workflowStore";
 
 export function OutputNode({ id, data, selected }: NodeProps) {
-  const { executingNodeId, runResult } = useWorkflowStore();
-  const isExecuting = executingNodeId === id;
+  const { nodeStatuses, runResult, streamingTexts } = useWorkflowStore();
+  const isExecuting = nodeStatuses[id] === "running";
 
   // Try to get live result from execution output
-  const liveOutput = runResult?.final_output?.[id];
+  const liveOutput = streamingTexts[id] || runResult?.final_output?.[id];
   const displayText = liveOutput
     ? String(liveOutput)
     : (data as any).result || null;
