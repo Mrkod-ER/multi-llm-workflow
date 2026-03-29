@@ -8,14 +8,30 @@ import { api } from "@/lib/api";
 import { useAutoLayout } from "@/hooks/useAutoLayout";
 
 export function Topbar({ onShowResults }: { onShowResults: () => void }) {
-  const { nodes, edges, addNode, setIsRunning, isRunning, setRunResult, setExecutingNodeId, runResult } = useWorkflowStore();
+  const {
+    nodes,
+    edges,
+    addNode,
+    setIsRunning,
+    isRunning,
+    setRunResult,
+    setNodeStatus,
+    resetNodeStatuses,
+    appendStreamingText,
+    resetStreamingTexts,
+    runResult,
+  } = useWorkflowStore();
+  
   const { applyLayout } = useAutoLayout();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [activeSocket, setActiveSocket] = useState<WebSocket | null>(null);
 
-  const handleRun = async () => {
+  const handleRun = () => {
     setIsRunning(true);
     setStatus("idle");
     setRunResult(null);
+    resetNodeStatuses();
+    resetStreamingTexts();
 
     // Map React Flow nodes to backend schema
     const workflowNodes = nodes.map((n) => ({
@@ -30,27 +46,37 @@ export function Topbar({ onShowResults }: { onShowResults: () => void }) {
       target: e.target,
     }));
 
-    try {
-      // Simulate per-node execution indicator
-      for (const node of nodes) {
-        setExecutingNodeId(node.id);
-        await new Promise((r) => setTimeout(r, 300));
+    const ws = api.runWorkflowStream(
+      { workflow: { nodes: workflowNodes, edges: workflowEdges } },
+      {
+        onNodeStart: (nodeId) => {
+          setNodeStatus(nodeId, "running");
+        },
+        onNodeChunk: (nodeId, chunk) => {
+          appendStreamingText(nodeId, chunk);
+        },
+        onNodeEnd: (nodeId, _output) => {
+          setNodeStatus(nodeId, "success");
+        },
+        onNodeError: (nodeId, _error) => {
+          setNodeStatus(nodeId, "error");
+        },
+        onWorkflowEnd: (result) => {
+          setRunResult(result as WorkflowRunResponse);
+          setStatus((result as any).status === "success" ? "success" : "error");
+          setIsRunning(false);
+          setActiveSocket(null);
+          onShowResults();
+        },
+        onError: (_error) => {
+          setStatus("error");
+          setIsRunning(false);
+          setActiveSocket(null);
+        },
       }
-      setExecutingNodeId(null);
-
-      const result: WorkflowRunResponse = await api.runWorkflow({
-        workflow: { nodes: workflowNodes, edges: workflowEdges },
-      });
-      setRunResult(result);
-      setStatus(result.status === "success" ? "success" : "error");
-      onShowResults();
-    } catch {
-      setStatus("error");
-      onShowResults();
-    } finally {
-      setIsRunning(false);
-      setExecutingNodeId(null);
-    }
+    );
+    
+    setActiveSocket(ws);
   };
 
   const addNodeItems = [
