@@ -150,6 +150,18 @@ class WorkflowRunner:
                 final_output=self.memory.read_all()
             )
             
+            # Persist to Redis out-of-band via fire-and-forget or awaited task
+            try:
+                from app.services.redis_client import redis_client
+                # We store a summary dictionary containing response and workflow structure
+                run_data = {
+                    "request": self.workflow.model_dump(),
+                    "response": final_response.model_dump()
+                }
+                await redis_client.save_run(workflow_id, run_data)
+            except Exception as e:
+                logger.error(f"Failed to persist workflow {workflow_id} to Redis: {e}")
+            
             await queue.put({
                 "type": "workflow_end",
                 "result": final_response.model_dump()
