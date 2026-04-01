@@ -51,8 +51,11 @@ app.add_middleware(
 setup_exception_handlers(app)
 
 # Register API routers
-from app.api.v1 import api_v1_router  # noqa: E402
-app.include_router(api_v1_router)
+from app.api.v1 import workflows, models, history
+
+app.include_router(workflows.router, prefix="/api/v1")
+app.include_router(models.router, prefix="/api/v1")
+app.include_router(history.router, prefix="/api/v1")
 
 @app.get("/health", tags=["System"])
 async def health_check() -> JSONResponse:
