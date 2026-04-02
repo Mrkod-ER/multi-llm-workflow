@@ -38,6 +38,13 @@ export const api = {
     return res.json();
   },
 
+  /** Fetch past workflow runs history */
+  fetchHistory: async (limit: number = 50) => {
+    const res = await fetch(`${API_BASE_URL}/api/v1/history/?limit=${limit}`);
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+
   /** Open a WebSocket connection to stream workflow execution */
   runWorkflowStream: (
     request: unknown,
