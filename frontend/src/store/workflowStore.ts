@@ -43,6 +43,10 @@ interface WorkflowState {
   appendStreamingText: (nodeId: string, text: string) => void;
   resetStreamingTexts: () => void;
 
+  // History
+  runsHistory: any[];
+  loadHistory: () => Promise<void>;
+
   // Models
   models: ModelInfo[];
   setModels: (models: ModelInfo[]) => void;
@@ -88,6 +92,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   executingNodeId: null,
   nodeStatuses: {},
   streamingTexts: {},
+  runsHistory: [],
   models: [],
 
   onNodesChange: (changes) =>
@@ -157,5 +162,13 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       },
     })),
   resetStreamingTexts: () => set({ streamingTexts: {} }),
+  loadHistory: async () => {
+    try {
+      const data = await api.fetchHistory();
+      set({ runsHistory: data });
+    } catch (e) {
+      console.error("Failed to load history", e);
+    }
+  },
   setModels: (models) => set({ models }),
 }));
