@@ -1,13 +1,13 @@
 "use client";
 import { useState } from "react";
-import { Play, Loader2, CheckCircle2, XCircle, Plus, FileText, BrainCircuit, MonitorPlay, GitBranch, LayoutTemplate, BarChart2 } from "lucide-react";
+import { Play, Loader2, CheckCircle2, XCircle, Plus, FileText, BrainCircuit, MonitorPlay, GitBranch, LayoutTemplate, BarChart2, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { NodeType, type WorkflowRunResponse } from "@/lib/types";
 import { api } from "@/lib/api";
 import { useAutoLayout } from "@/hooks/useAutoLayout";
 
-export function Topbar({ onShowResults }: { onShowResults: () => void }) {
+export function Topbar({ onShowResults, onShowHistory }: { onShowResults: () => void, onShowHistory: () => void }) {
   const {
     nodes,
     edges,
@@ -142,6 +142,16 @@ export function Topbar({ onShowResults }: { onShowResults: () => void }) {
         >
           <LayoutTemplate size={12} />
           Auto Layout
+        </button>
+
+        {/* View History */}
+        <button
+          id="view-history-btn"
+          onClick={onShowHistory}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-teal-300 hover:text-white bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 transition-all"
+        >
+          <History size={12} />
+          History
         </button>
 
         {/* View Results */}
