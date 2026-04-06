@@ -9,6 +9,7 @@ import type {
   Connection,
 } from "@xyflow/react";
 import { NodeType, type WorkflowRunResponse, type ModelInfo } from "@/lib/types";
+import { api } from "@/lib/api";
 
 let nodeIdCounter = 3;
 
