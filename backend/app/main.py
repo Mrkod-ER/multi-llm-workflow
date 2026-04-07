@@ -12,6 +12,7 @@ from app.logger import setup_logging
 setup_logging()
 logger = logging.getLogger(__name__)
 
+
 @contextlib.asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """
@@ -21,6 +22,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("Starting up Multi-LLM Workflow Builder backend...")
     yield
     logger.info("Shutting down backend...")
+
 
 from app.config import get_settings
 from app.exceptions import setup_exception_handlers
@@ -51,11 +53,12 @@ app.add_middleware(
 setup_exception_handlers(app)
 
 # Register API routers
-from app.api.v1 import workflows, models, history
+from app.api.v1 import history, models, workflows
 
 app.include_router(workflows.router, prefix="/api/v1")
 app.include_router(models.router, prefix="/api/v1")
 app.include_router(history.router, prefix="/api/v1")
+
 
 @app.get("/health", tags=["System"])
 async def health_check() -> JSONResponse:

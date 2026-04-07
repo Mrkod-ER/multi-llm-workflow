@@ -8,9 +8,10 @@ class Settings(BaseSettings):
     """
     Application settings parsed from environment variables.
     """
+
     # Server
     backend_port: int = 8000
-    
+
     # CORS
     allowed_origins: str = "http://localhost:3000"
 
@@ -32,7 +33,11 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> List[str]:
         """Convert comma-separated string to list of origins."""
-        return [origin.strip() for origin in self.allowed_origins.split(",") if origin.strip()]
+        return [
+            origin.strip()
+            for origin in self.allowed_origins.split(",")
+            if origin.strip()
+        ]
 
 
 @lru_cache()

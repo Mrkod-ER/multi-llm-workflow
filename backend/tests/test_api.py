@@ -1,14 +1,24 @@
 from fastapi.testclient import TestClient
-import pytest
 
-from app.schemas.node import Node, NodePosition, NodeType, InputNodeData, OutputNodeData
 from app.schemas.edge import Edge
+from app.schemas.node import InputNodeData, Node, NodePosition, NodeType, OutputNodeData
 from app.schemas.workflow import Workflow
+
 
 # --- Helpers ---
 def make_simple_workflow():
-    n1 = Node(id="n1", type=NodeType.INPUT, position=NodePosition(x=0, y=0), data=InputNodeData(text="hello world"))
-    n2 = Node(id="n2", type=NodeType.OUTPUT, position=NodePosition(x=1, y=0), data=OutputNodeData())
+    n1 = Node(
+        id="n1",
+        type=NodeType.INPUT,
+        position=NodePosition(x=0, y=0),
+        data=InputNodeData(text="hello world"),
+    )
+    n2 = Node(
+        id="n2",
+        type=NodeType.OUTPUT,
+        position=NodePosition(x=1, y=0),
+        data=OutputNodeData(),
+    )
     e1 = Edge(id="e1", source="n1", target="n2")
     return Workflow(nodes=[n1, n2], edges=[e1])
 
@@ -25,13 +35,26 @@ def test_validate_valid_workflow(client: TestClient):
 
 
 def test_validate_cyclic_workflow(client: TestClient):
-    n1 = Node(id="n1", type=NodeType.INPUT, position=NodePosition(x=0, y=0), data=InputNodeData(text="start"))
-    n2 = Node(id="n2", type=NodeType.OUTPUT, position=NodePosition(x=1, y=0), data=OutputNodeData())
+    n1 = Node(
+        id="n1",
+        type=NodeType.INPUT,
+        position=NodePosition(x=0, y=0),
+        data=InputNodeData(text="start"),
+    )
+    n2 = Node(
+        id="n2",
+        type=NodeType.OUTPUT,
+        position=NodePosition(x=1, y=0),
+        data=OutputNodeData(),
+    )
     edges = [
         Edge(id="e1", source="n1", target="n2"),
         Edge(id="e2", source="n2", target="n1"),  # creates cycle
     ]
-    wf = {"nodes": [n1.model_dump(), n2.model_dump()], "edges": [e.model_dump() for e in edges]}
+    wf = {
+        "nodes": [n1.model_dump(), n2.model_dump()],
+        "edges": [e.model_dump() for e in edges],
+    }
     response = client.post("/api/v1/workflows/validate", json=wf)
     assert response.status_code == 422
     data = response.json()

@@ -1,13 +1,18 @@
 from collections import defaultdict, deque
-from typing import Dict, List, Set
+from typing import Dict, List
 
+from app.exceptions import WorkflowError
 from app.schemas.edge import Edge
 from app.schemas.node import Node
-from app.exceptions import WorkflowError
+
 
 class WorkflowCycleError(WorkflowError):
     """Raised when the workflow graph contains a cycle."""
-    def __init__(self, message: str = "A cycle was detected in the workflow graph. LLM DAGs cannot contain circular dependencies."):
+
+    def __init__(
+        self,
+        message: str = "A cycle was detected in the workflow graph. LLM DAGs cannot contain circular dependencies.",
+    ):
         super().__init__(message=message, status_code=400)
 
 
@@ -36,31 +41,31 @@ def validate_dag(nodes: List[Node], edges: List[Edge]) -> List[str]:
     """
     Validates that the provided nodes and edges form a Directed Acyclic Graph (DAG)
     and returns a topologically sorted list of node IDs determining execution order.
-    
+
     Uses Kahn's Algorithm for topological sorting.
     """
     in_degree = build_in_degree_map(nodes, edges)
     adj_list = build_adjacency_list(edges)
-    
+
     # Start with nodes that have no prerequisites
     queue = deque([node_id for node_id, count in in_degree.items() if count == 0])
-    
+
     sorted_nodes: List[str] = []
-    
+
     while queue:
         current_node = queue.popleft()
         sorted_nodes.append(current_node)
-        
+
         # Decrement the in-degree of all target nodes
         for target in adj_list[current_node]:
             if target in in_degree:
                 in_degree[target] -= 1
                 if in_degree[target] == 0:
                     queue.append(target)
-                    
+
     if len(sorted_nodes) != len(nodes):
         raise WorkflowCycleError()
-        
+
     return sorted_nodes
 
 

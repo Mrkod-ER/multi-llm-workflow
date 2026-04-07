@@ -1,7 +1,7 @@
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from app.providers.discovery import list_all_models
 from app.providers.factory import ProviderFactory
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
     "/",
     summary="List all available models",
     description="Returns a combined list of models available in Ollama locally and from configured cloud providers.",
-    response_model=List[Dict[str, Any]]
+    response_model=List[Dict[str, Any]],
 )
 async def get_available_models():
     """
@@ -34,14 +34,16 @@ async def get_available_models():
 async def get_provider_health():
     """Queries health of each LLM provider to help users diagnose connectivity issues."""
     health_status = {}
-    
+
     for provider_type in LLMProviderType:
         try:
             provider = ProviderFactory.get_provider(provider_type)
             is_healthy = await provider.health_check()
-            health_status[provider_type.value] = {"status": "ok" if is_healthy else "degraded"}
+            health_status[provider_type.value] = {
+                "status": "ok" if is_healthy else "degraded"
+            }
         except Exception as e:
             logger.warning(f"Health check failed for {provider_type}: {e}")
             health_status[provider_type.value] = {"status": "error", "detail": str(e)}
-    
+
     return {"providers": health_status}

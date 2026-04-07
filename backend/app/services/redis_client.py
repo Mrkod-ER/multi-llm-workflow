@@ -1,13 +1,17 @@
 import json
 import logging
 from datetime import datetime, timezone
+
 import redis.asyncio as redis
+
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 
+
 class RedisClient:
     """Singleton asynchronous wrapper for Redis interactions."""
+
     _instance = None
 
     def __new__(cls):
@@ -38,24 +42,20 @@ class RedisClient:
 
         try:
             timestamp = datetime.now(timezone.utc).isoformat()
-            
+
             # Ensure the run_data contains the ID and timestamp
-            data_to_store = {
-                "id": workflow_id,
-                "timestamp": timestamp,
-                **run_data
-            }
-            
+            data_to_store = {"id": workflow_id, "timestamp": timestamp, **run_data}
+
             payload = json.dumps(data_to_store)
-            
+
             # ZADD uses the timestamp epoch to order lists chronologically
             epoch = datetime.now().timestamp()
-            
+
             async with self.client.pipeline(transaction=True) as pipe:
                 pipe.hset("workflows:history", workflow_id, payload)
                 pipe.zadd("workflows:timeline", {workflow_id: epoch})
                 await pipe.execute()
-                
+
             return True
         except Exception as e:
             logger.error(f"Failed saving to Redis: {e}")
@@ -67,24 +67,25 @@ class RedisClient:
             await self.connect()
         if not self.client:
             return []
-            
+
         try:
             # Get latest ID's from timeline score
             latest_ids = await self.client.zrevrange("workflows:timeline", 0, limit - 1)
             if not latest_ids:
                 return []
-                
+
             # Fetch hashes
             raw_runs = await self.client.hmget("workflows:history", latest_ids)
-            
+
             runs = []
             for raw in raw_runs:
                 if raw:
                     runs.append(json.loads(raw))
-                    
+
             return runs
         except Exception as e:
             logger.error(f"Failed fetching runs from Redis: {e}")
             return []
+
 
 redis_client = RedisClient()

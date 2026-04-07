@@ -1,9 +1,10 @@
 import pytest
+
 from app.providers.factory import ProviderFactory
 from app.providers.mock import MockProvider
-from app.providers.openai import OpenAIProvider
 from app.providers.ollama import OllamaProvider
-from app.providers.schema import LLMProviderType, LLMRequest, ChatMessage
+from app.providers.openai import OpenAIProvider
+from app.providers.schema import ChatMessage, LLMProviderType, LLMRequest
 
 
 def test_provider_factory_routing():
@@ -23,9 +24,9 @@ async def test_mock_provider():
     req = LLMRequest(
         provider=LLMProviderType.MOCK,
         model="mock-model",
-        messages=[ChatMessage(role="user", content="ping")]
+        messages=[ChatMessage(role="user", content="ping")],
     )
-    
+
     resp = await provider.generate(req)
     assert "Mocked response" in resp.content
     assert "ping" in resp.content

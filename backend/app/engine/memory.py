@@ -1,12 +1,14 @@
 import time
 from typing import Any, Dict
 
+
 class MemoryStore:
     """
     A shared memory store for passing data between nodes during execution.
-    For Phase 4, this is an in-memory dictionary. 
+    For Phase 4, this is an in-memory dictionary.
     Later, this can be swapped out for a Redis-backed implementation if persistence is required.
     """
+
     def __init__(self):
         self._store: Dict[str, Dict[str, Any]] = {}
 
@@ -15,10 +17,7 @@ class MemoryStore:
         Write a value to the store.
         """
         expires_at = time.time() + ttl if ttl is not None else None
-        self._store[key] = {
-            "value": value,
-            "expires_at": expires_at
-        }
+        self._store[key] = {"value": value, "expires_at": expires_at}
 
     def read(self, key: str, default: Any = None) -> Any:
         """
@@ -27,13 +26,13 @@ class MemoryStore:
         item = self._store.get(key)
         if not item:
             return default
-            
+
         expires_at = item.get("expires_at")
         if expires_at is not None and time.time() > expires_at:
             # Key has expired
             del self._store[key]
             return default
-            
+
         return item.get("value")
 
     def read_all(self) -> Dict[str, Any]:

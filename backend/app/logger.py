@@ -1,6 +1,7 @@
 import logging
 import sys
 
+
 def setup_logging() -> None:
     """Configure structured JSON logging."""
     # For now, we will configure a simple standard logger.

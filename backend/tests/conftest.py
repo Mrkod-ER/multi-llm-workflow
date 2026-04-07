@@ -1,13 +1,15 @@
 import pytest
-from httpx import AsyncClient
 from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from app.main import app
+
 
 @pytest.fixture
 def client() -> TestClient:
     """Synchronous test client for simple endpoint tests."""
     return TestClient(app)
+
 
 @pytest.fixture
 async def async_client() -> AsyncClient:

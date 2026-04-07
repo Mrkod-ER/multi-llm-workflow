@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1 import workflows, models, docs
+from app.api.v1 import docs, models, workflows
 
 # Central v1 router that aggregates all sub-routers
 api_v1_router = APIRouter(prefix="/api/v1")

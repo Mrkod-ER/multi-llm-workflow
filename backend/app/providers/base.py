@@ -3,9 +3,10 @@ from typing import AsyncGenerator
 
 from app.providers.schema import LLMRequest, LLMResponse
 
+
 class BaseLLMProvider(ABC):
     """Abstract base class dictating the interface for all LLM network providers."""
-    
+
     @abstractmethod
     async def generate(self, request: LLMRequest) -> LLMResponse:
         """
@@ -20,7 +21,7 @@ class BaseLLMProvider(ABC):
         Sends the generation payload and yields the response in incremental text chunks.
         """
         pass
-        
+
     @abstractmethod
     async def health_check(self) -> bool:
         """

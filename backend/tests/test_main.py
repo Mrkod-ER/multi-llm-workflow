@@ -1,5 +1,4 @@
 from fastapi.testclient import TestClient
-import pytest
 
 
 def test_health_check(client: TestClient) -> None:
@@ -20,5 +19,7 @@ def test_cors_headers(client: TestClient) -> None:
     }
     response = client.options("/health", headers=headers)
     assert response.status_code == 200
-    assert response.headers.get("access-control-allow-origin") == "http://localhost:3000"
+    assert (
+        response.headers.get("access-control-allow-origin") == "http://localhost:3000"
+    )
     assert "access-control-allow-methods" in response.headers
