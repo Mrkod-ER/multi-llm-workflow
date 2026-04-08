@@ -7,19 +7,19 @@ from app.providers.openai import OpenAIProvider
 from app.providers.schema import ChatMessage, LLMProviderType, LLMRequest
 
 
-def test_provider_factory_routing():
+def test_provider_factory_routing() -> None:
     assert isinstance(ProviderFactory.get_provider(LLMProviderType.MOCK), MockProvider)
     assert isinstance(ProviderFactory.get_provider("openai"), OpenAIProvider)
     assert isinstance(ProviderFactory.get_provider("ollama"), OllamaProvider)
 
 
-def test_provider_factory_invalid():
+def test_provider_factory_invalid() -> None:
     with pytest.raises(ValueError):
         ProviderFactory.get_provider("anthropic_direct")
 
 
 @pytest.mark.asyncio
-async def test_mock_provider():
+async def test_mock_provider() -> None:
     provider = ProviderFactory.get_provider(LLMProviderType.MOCK)
     req = LLMRequest(
         provider=LLMProviderType.MOCK,

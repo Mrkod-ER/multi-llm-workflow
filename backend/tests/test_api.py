@@ -24,7 +24,7 @@ def make_simple_workflow():
 
 
 # --- Validate endpoint tests ---
-def test_validate_valid_workflow(client: TestClient):
+def test_validate_valid_workflow(client: TestClient) -> None:
     wf = make_simple_workflow()
     response = client.post("/api/v1/workflows/validate", json=wf.model_dump())
     assert response.status_code == 200
@@ -34,7 +34,7 @@ def test_validate_valid_workflow(client: TestClient):
     assert data["node_count"] == 2
 
 
-def test_validate_cyclic_workflow(client: TestClient):
+def test_validate_cyclic_workflow(client: TestClient) -> None:
     n1 = Node(
         id="n1",
         type=NodeType.INPUT,
@@ -62,7 +62,7 @@ def test_validate_cyclic_workflow(client: TestClient):
 
 
 # --- Run endpoint tests ---
-def test_run_simple_workflow(client: TestClient):
+def test_run_simple_workflow(client: TestClient) -> None:
     wf = make_simple_workflow()
     request_payload = {"workflow": wf.model_dump()}
     response = client.post("/api/v1/workflows/run", json=request_payload)
@@ -74,14 +74,14 @@ def test_run_simple_workflow(client: TestClient):
 
 
 # --- Models endpoint tests ---
-def test_get_models(client: TestClient):
+def test_get_models(client: TestClient) -> None:
     response = client.get("/api/v1/models/")
     # Models endpoint hits Ollama/OpenAI; it may be empty in CI but must not error
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
 
-def test_get_provider_health(client: TestClient):
+def test_get_provider_health(client: TestClient) -> None:
     response = client.get("/api/v1/models/health")
     assert response.status_code == 200
     data = response.json()

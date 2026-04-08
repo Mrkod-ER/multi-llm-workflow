@@ -1,7 +1,7 @@
 from app.engine.memory import MemoryStore
 
 
-def test_memory_store_write_read():
+def test_memory_store_write_read() -> None:
     mem = MemoryStore()
     mem.write("k1", "value1")
     assert mem.read("k1") == "value1"
@@ -9,7 +9,7 @@ def test_memory_store_write_read():
     assert mem.read("k2", default="fallback") == "fallback"
 
 
-def test_memory_store_clear():
+def test_memory_store_clear() -> None:
     mem = MemoryStore()
     mem.write("k1", "value1")
     mem.clear()

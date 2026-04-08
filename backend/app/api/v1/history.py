@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
     description="Returns a chronologically descending list of all saved workflow runs.",
     response_model=List[Dict[str, Any]],
 )
-async def get_history(limit: int = 50):
+async def get_history(limit: int = 50) -> List[Dict[str, Any]]:
     """
     Fetches the latest workflow runs stored in Redis.
     """

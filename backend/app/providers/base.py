@@ -20,7 +20,7 @@ class BaseLLMProvider(ABC):
         """
         Sends the generation payload and yields the response in incremental text chunks.
         """
-        pass
+        yield ""
 
     @abstractmethod
     async def health_check(self) -> bool:

@@ -9,7 +9,7 @@ class MemoryStore:
     Later, this can be swapped out for a Redis-backed implementation if persistence is required.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._store: Dict[str, Dict[str, Any]] = {}
 
     def write(self, key: str, value: Any, ttl: int | None = None) -> None:

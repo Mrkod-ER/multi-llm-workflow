@@ -12,7 +12,7 @@ from app.schemas.node import (
 from app.schemas.workflow import Workflow
 
 
-def test_valid_input_node():
+def test_valid_input_node() -> None:
     node = Node(
         id="node-1",
         type=NodeType.INPUT,
@@ -23,19 +23,19 @@ def test_valid_input_node():
     assert node.data.type == NodeType.INPUT
 
 
-def test_edge_self_reference_validation():
+def test_edge_self_reference_validation() -> None:
     with pytest.raises(ValidationError, match="Self-referencing edges are not allowed"):
         Edge(id="edge-1", source="node-1", target="node-1")
 
 
-def test_workflow_empty_nodes_validation():
+def test_workflow_empty_nodes_validation() -> None:
     with pytest.raises(
         ValidationError, match="Workflow must contain at least one node"
     ):
         Workflow(nodes=[], edges=[])
 
 
-def test_workflow_missing_input_validation():
+def test_workflow_missing_input_validation() -> None:
     node = Node(
         id="node-2",
         type=NodeType.OUTPUT,
@@ -48,7 +48,7 @@ def test_workflow_missing_input_validation():
         Workflow(nodes=[node], edges=[])
 
 
-def test_valid_workflow():
+def test_valid_workflow() -> None:
     node_in = Node(
         id="node-1",
         type=NodeType.INPUT,

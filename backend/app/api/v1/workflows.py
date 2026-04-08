@@ -29,7 +29,9 @@ logger = logging.getLogger(__name__)
     description="Runs structural validation on the workflow without executing it. Checks for cycles and connectivity.",
     response_model=dict,
 )
-async def validate_workflow(workflow: Workflow):
+from typing import Any
+
+async def validate_workflow(workflow: Workflow) -> Any:
     """
     Validates the structural integrity of a workflow graph:
     - Checks that there are no circular dependencies
@@ -60,7 +62,7 @@ async def validate_workflow(workflow: Workflow):
     description="Validates, topologically sorts, and executes all nodes in the workflow using the configured LLM providers.",
     response_model=WorkflowRunResponse,
 )
-async def run_workflow(request: WorkflowRunRequest):
+async def run_workflow(request: WorkflowRunRequest) -> Any:
     """
     Triggers a full workflow execution:
     1. Validates the DAG structure
@@ -88,7 +90,7 @@ async def run_workflow(request: WorkflowRunRequest):
 
 
 @router.websocket("/ws/run")
-async def ws_run_workflow(websocket: WebSocket):
+async def ws_run_workflow(websocket: WebSocket) -> None:
     """
     WebSocket endpoint for real-time workflow execution.
     Expects a WorkflowRunRequest JSON payload upon connection.

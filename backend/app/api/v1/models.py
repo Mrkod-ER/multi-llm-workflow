@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
     description="Returns a combined list of models available in Ollama locally and from configured cloud providers.",
     response_model=List[Dict[str, Any]],
 )
-async def get_available_models():
+async def get_available_models() -> List[Dict[str, Any]]:
     """
     Dynamically discovers and aggregates all LLM models available
     across configured providers (Ollama, OpenAI etc).

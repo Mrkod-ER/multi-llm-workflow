@@ -14,20 +14,20 @@ class RedisClient:
 
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls) -> "RedisClient":
         if cls._instance is None:
             cls._instance = super(RedisClient, cls).__new__(cls)
-            cls._instance.client = None
+            cls._instance.client = None # type: ignore
         return cls._instance
 
-    async def connect(self):
+    async def connect(self) -> None:
         """Initializes the connection pool if not already initialized."""
         if self.client is None:
             settings = get_settings()
             try:
-                self.client = redis.from_url(settings.redis_url, decode_responses=True)
+                self.client = redis.from_url(settings.redis_url, decode_responses=True) # type: ignore
                 # Test connection
-                await self.client.ping()
+                await self.client.ping() # type: ignore
                 logger.info(f"Connected to Redis at {settings.redis_url}")
             except Exception as e:
                 logger.error(f"Failed to connect to Redis: {e}")

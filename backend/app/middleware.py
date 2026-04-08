@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class RequestContextMiddleware(BaseHTTPMiddleware):
     """Middleware to inject a request ID and track execution time."""
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         request_id = str(uuid.uuid4())
         request.state.request_id = request_id
 

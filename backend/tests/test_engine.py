@@ -10,7 +10,7 @@ from app.schemas.node import InputNodeData, Node, NodePosition, NodeType, Output
 from app.schemas.workflow import Workflow, WorkflowMetadata
 
 
-def test_topological_sort_linear():
+def test_topological_sort_linear() -> None:
     n1 = Node(
         id="1",
         type=NodeType.INPUT,
@@ -31,7 +31,7 @@ def test_topological_sort_linear():
     assert sorted_ids == ["1", "2"]
 
 
-def test_cycle_detection():
+def test_cycle_detection() -> None:
     n1 = Node(
         id="1",
         type=NodeType.INPUT,
@@ -54,7 +54,7 @@ def test_cycle_detection():
 
 
 @pytest.mark.asyncio
-async def test_input_executor():
+async def test_input_executor() -> None:
     node = Node(
         id="in_1",
         type=NodeType.INPUT,
@@ -71,7 +71,7 @@ async def test_input_executor():
 
 
 @pytest.mark.asyncio
-async def test_workflow_runner():
+async def test_workflow_runner() -> None:
     n1 = Node(
         id="in_1",
         type=NodeType.INPUT,
@@ -84,7 +84,6 @@ async def test_workflow_runner():
         position=NodePosition(x=0, y=0),
         data=OutputNodeData(),
     )
-    wf_metadata = WorkflowMetadata(name="test")
     wf = Workflow(nodes=[n1, n2], edges=[Edge(id="e1", source="in_1", target="out_1")])
 
     request = WorkflowRunRequest(workflow=wf)
@@ -95,4 +94,4 @@ async def test_workflow_runner():
     assert len(response.results) == 2
     assert response.results[0].node_id == "in_1"
     assert response.results[0].output == "test data"
-    assert response.final_output.get("in_1") == "test data"
+    assert response.final_output and response.final_output.get("in_1") == "test data" # type: ignore
