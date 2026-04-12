@@ -24,7 +24,7 @@ export function Topbar({ onShowResults, onShowHistory }: { onShowResults: () => 
   
   const { applyLayout } = useAutoLayout();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [activeSocket, setActiveSocket] = useState<WebSocket | null>(null);
+  const [activeSocket_unused, setActiveSocket] = useState<WebSocket | null>(null);
 
   const handleRun = () => {
     setIsRunning(true);
@@ -55,10 +55,10 @@ export function Topbar({ onShowResults, onShowHistory }: { onShowResults: () => 
         onNodeChunk: (nodeId, chunk) => {
           appendStreamingText(nodeId, chunk);
         },
-        onNodeEnd: (nodeId, _output) => {
+        onNodeEnd: (nodeId, _output_unused) => {
           setNodeStatus(nodeId, "success");
         },
-        onNodeError: (nodeId, _error) => {
+        onNodeError: (nodeId, _error_unused) => {
           setNodeStatus(nodeId, "error");
         },
         onWorkflowEnd: (result) => {
@@ -68,7 +68,7 @@ export function Topbar({ onShowResults, onShowHistory }: { onShowResults: () => 
           setActiveSocket(null);
           onShowResults();
         },
-        onError: (_error) => {
+        onError: (_error_unused) => {
           setStatus("error");
           setIsRunning(false);
           setActiveSocket(null);

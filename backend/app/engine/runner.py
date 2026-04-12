@@ -188,7 +188,7 @@ class WorkflowRunner:
             )
             await queue.put({"type": "done"})
 
-        task = asyncio.create_task(_execute_graph())
+        asyncio.create_task(_execute_graph())
 
         while True:
             event = await queue.get()

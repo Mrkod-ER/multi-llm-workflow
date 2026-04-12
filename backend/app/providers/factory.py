@@ -26,4 +26,4 @@ class ProviderFactory:
         if not provider_class:
             raise ValueError(f"Unknown provider type: {provider_type}")
 
-        return provider_class()
+        return provider_class()  # type: ignore

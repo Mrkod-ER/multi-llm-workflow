@@ -1,5 +1,6 @@
 import logging
 import uuid
+from typing import Any
 
 from fastapi import (
     APIRouter,
@@ -29,8 +30,6 @@ logger = logging.getLogger(__name__)
     description="Runs structural validation on the workflow without executing it. Checks for cycles and connectivity.",
     response_model=dict,
 )
-from typing import Any
-
 async def validate_workflow(workflow: Workflow) -> Any:
     """
     Validates the structural integrity of a workflow graph:

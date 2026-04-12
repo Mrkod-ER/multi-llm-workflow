@@ -45,7 +45,7 @@ interface WorkflowState {
   resetStreamingTexts: () => void;
 
   // History
-  runsHistory: any[];
+  runsHistory: unknown[];
   loadHistory: () => Promise<void>;
 
   // Models
