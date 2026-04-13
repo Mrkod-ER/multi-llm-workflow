@@ -1,7 +1,6 @@
 "use client";
 import {
   BaseEdge,
-  EdgeLabelRenderer_unused,
   getStraightPath,
   type EdgeProps,
 } from "@xyflow/react";
@@ -16,8 +15,8 @@ export function AnimatedDataEdge({
   sourceY,
   targetX,
   targetY,
-  sourcePosition_unused,
-  targetPosition_unused,
+  sourcePosition,
+  targetPosition,
   selected,
 }: EdgeProps) {
   const [edgePath] = getStraightPath({ sourceX, sourceY, targetX, targetY });

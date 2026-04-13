@@ -13,6 +13,16 @@ import { api } from "@/lib/api";
 
 let nodeIdCounter = 3;
 
+interface HistoryRun {
+  id?: string;
+  timestamp: string;
+  response?: {
+    status?: string;
+    total_duration_ms?: number;
+    final_output?: Record<string, string>;
+  };
+}
+
 interface WorkflowState {
   // Graph state
   nodes: Node[];
@@ -45,7 +55,7 @@ interface WorkflowState {
   resetStreamingTexts: () => void;
 
   // History
-  runsHistory: unknown[];
+  runsHistory: HistoryRun[];
   loadHistory: () => Promise<void>;
 
   // Models

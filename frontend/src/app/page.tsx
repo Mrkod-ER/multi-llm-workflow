@@ -14,7 +14,7 @@ export default function Home() {
 
   return (
     <ReactFlowProvider>
-      <div className="flex flex-col h-screen w-screen overflow-hidden bg-[oklch(10%_0.02_265)] animate-in fade-in duration-500">
+      <div className="flex flex-col h-screen w-screen overflow-hidden bg-[oklch(10%_0.02_265)]">
         <Topbar 
           onShowResults={() => setShowResults(true)} 
           onShowHistory={() => setShowHistory(true)} 
