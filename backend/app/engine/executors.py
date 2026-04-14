@@ -85,7 +85,7 @@ class LLMNodeExecutor(BaseNodeExecutor):
         # In a generic way, we could append memory outputs. For MVP, we pass dummy text or what's in memory.
         # Check if there is an input in memory
         input_texts = [
-            val for key, val in context.memory.store.items() if key != node.id
+            val for key, val in context.memory.read_all().items() if key != node.id
         ]
         if input_texts:
             messages.append(
