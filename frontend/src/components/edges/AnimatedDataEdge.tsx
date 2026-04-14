@@ -1,14 +1,12 @@
 "use client";
 import {
   BaseEdge,
-  getStraightPath,
+  EdgeLabelRenderer,
+  getBezierPath,
+  useReactFlow,
   type EdgeProps,
 } from "@xyflow/react";
 
-/**
- * AnimatedDataEdge — a custom React Flow edge that renders an animated
- * "data packet" particle travelling from source to target along the path.
- */
 export function AnimatedDataEdge({
   id,
   sourceX,
@@ -19,21 +17,56 @@ export function AnimatedDataEdge({
   targetPosition,
   selected,
 }: EdgeProps) {
-  const [edgePath] = getStraightPath({ sourceX, sourceY, targetX, targetY });
+  const { setEdges } = useReactFlow();
 
-  const strokeColor = selected ? "rgba(148,100,255,0.9)" : "rgba(148,100,255,0.45)";
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
+
+  const strokeColor = selected ? "rgba(148,100,255,1)" : "rgba(148,100,255,0.4)";
+
+  const deleteEdge = () => {
+    setEdges((edges) => edges.filter((e) => e.id !== id));
+  };
 
   return (
     <>
       <BaseEdge
         id={id}
         path={edgePath}
-        style={{ stroke: strokeColor, strokeWidth: selected ? 2.5 : 2 }}
+        style={{ stroke: strokeColor, strokeWidth: selected ? 2.5 : 1.8 }}
       />
       {/* Animated travelling dot */}
-      <circle r="4" fill="rgba(148,100,255,0.9)">
-        <animateMotion dur="1.6s" repeatCount="indefinite" path={edgePath} />
+      <circle r="3.5" fill="rgba(148,100,255,0.9)">
+        <animateMotion dur="1.8s" repeatCount="indefinite" path={edgePath} />
       </circle>
+
+      {/* Delete button — visible on hover/select */}
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            position: "absolute",
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            pointerEvents: "all",
+            opacity: selected ? 1 : 0,
+            transition: "opacity 0.15s ease",
+          }}
+          className="nodrag nopan group"
+        >
+          <button
+            onClick={deleteEdge}
+            className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/80 hover:bg-red-500 border border-red-400/60 text-white text-[10px] font-bold shadow-lg transition-all duration-150 hover:scale-110"
+            title="Delete edge"
+          >
+            ×
+          </button>
+        </div>
+      </EdgeLabelRenderer>
     </>
   );
 }

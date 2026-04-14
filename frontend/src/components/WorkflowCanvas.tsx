@@ -88,14 +88,19 @@ export function WorkflowCanvas() {
         onPaneContextMenu={onPaneContextMenu}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        deleteKeyCode={["Backspace", "Delete"]}
+        multiSelectionKeyCode="Shift"
         fitView
-        fitViewOptions={{ padding: 0.2 }}
+        fitViewOptions={{ padding: 0.25 }}
         defaultEdgeOptions={{
           type: "animatedData",
           style: { strokeWidth: 2 },
         }}
-        connectionLineStyle={{ stroke: "rgba(148,100,255,0.8)", strokeWidth: 2 }}
+        connectionLineStyle={{ stroke: "rgba(148,100,255,0.7)", strokeWidth: 2 }}
+        connectionLineType={"bezier" as any}
         proOptions={{ hideAttribution: true }}
+        snapToGrid
+        snapGrid={[16, 16]}
       >
         <Background
           variant={BackgroundVariant.Dots}
