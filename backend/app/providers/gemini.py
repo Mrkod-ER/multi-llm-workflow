@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import AsyncGenerator
 
 import litellm
@@ -14,13 +15,20 @@ logger = logging.getLogger(__name__)
 class GeminiProvider(BaseLLMProvider):
     """
     Provider implementation for Google Gemini models via LiteLLM.
-    Supports Gemini 1.5 Pro, Gemini 1.5 Flash, and other Gemini variants.
-    Requires GOOGLE_API_KEY in environment.
+    Supports Gemini 1.5 Pro, Gemini 1.5 Flash, Gemini 2.0 Flash, etc.
+
+    LiteLLM routes gemini/ models to the Google AI Studio endpoint
+    (generativelanguage.googleapis.com) when GEMINI_API_KEY is set.
     """
 
     def __init__(self) -> None:
         settings = get_settings()
         self.api_key = settings.google_api_key
+
+        # LiteLLM reads GEMINI_API_KEY (not GOOGLE_API_KEY) to route
+        # requests to Google AI Studio (not Vertex AI).
+        if self.api_key:
+            os.environ["GEMINI_API_KEY"] = self.api_key
 
     def _prefixed_model(self, model: str) -> str:
         """Ensure model name has the gemini/ prefix LiteLLM expects."""
@@ -47,12 +55,10 @@ class GeminiProvider(BaseLLMProvider):
                 messages=api_messages,
                 temperature=request.temperature,
                 max_tokens=request.max_tokens,
-                api_key=self.api_key,
             )
 
             content = response.choices[0].message.content or ""
             usage = dict(response.usage) if response.usage else {}
-
             return LLMResponse(content=content, model=model, usage=usage)
 
         except Exception as e:
@@ -78,7 +84,6 @@ class GeminiProvider(BaseLLMProvider):
                 messages=api_messages,
                 temperature=request.temperature,
                 max_tokens=request.max_tokens,
-                api_key=self.api_key,
                 stream=True,
             )
 
