@@ -9,6 +9,7 @@ class LLMProviderType(str, Enum):
 
     OPENAI = "openai"
     OLLAMA = "ollama"
+    GEMINI = "gemini"
     MOCK = "mock"
 
 

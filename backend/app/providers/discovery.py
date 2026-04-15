@@ -41,8 +41,6 @@ async def list_openai_models() -> List[Dict[str, Any]]:
     if not settings.openai_api_key:
         return []
 
-    # We could query the raw API, or return a static list of reliable standard ones
-    # for rendering in the UI dropdown.
     return [
         {"id": "gpt-4o", "provider": "openai"},
         {"id": "gpt-4-turbo", "provider": "openai"},
@@ -50,9 +48,23 @@ async def list_openai_models() -> List[Dict[str, Any]]:
     ]
 
 
+async def list_gemini_models() -> List[Dict[str, Any]]:
+    """Returns available Gemini models when GOOGLE_API_KEY is configured."""
+    settings = get_settings()
+    if not settings.google_api_key:
+        return []
+
+    return [
+        {"id": "gemini-1.5-flash", "provider": "gemini", "description": "Fast & efficient"},
+        {"id": "gemini-1.5-pro",   "provider": "gemini", "description": "Most capable"},
+        {"id": "gemini-2.0-flash", "provider": "gemini", "description": "Latest generation"},
+    ]
+
+
 async def list_all_models() -> List[Dict[str, Any]]:
     """Aggregates models actively available across all configured providers."""
     ollama_models = await list_ollama_models()
     openai_models = await list_openai_models()
+    gemini_models = await list_gemini_models()
 
-    return ollama_models + openai_models
+    return ollama_models + openai_models + gemini_models

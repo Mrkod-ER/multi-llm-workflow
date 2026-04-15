@@ -1,4 +1,5 @@
 from app.providers.base import BaseLLMProvider
+from app.providers.gemini import GeminiProvider
 from app.providers.mock import MockProvider
 from app.providers.ollama import OllamaProvider
 from app.providers.openai import OpenAIProvider
@@ -11,6 +12,7 @@ class ProviderFactory:
     _registry = {
         LLMProviderType.MOCK: MockProvider,
         LLMProviderType.OPENAI: OpenAIProvider,
+        LLMProviderType.GEMINI: GeminiProvider,
         LLMProviderType.OLLAMA: OllamaProvider,
     }
 
