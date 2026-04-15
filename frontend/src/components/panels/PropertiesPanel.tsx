@@ -120,7 +120,7 @@ export function PropertiesPanel() {
                 onChange={(e) => updateNodeData(selectedNode.id, { model: e.target.value })}
               />
               <p className="text-[10px] text-white/25 mt-1">
-                {data.provider === "gemini" && "Try: gemini-1.5-flash, gemini-1.5-pro"}
+                {data.provider === "gemini" && "Try: gemini-2.5-flash, gemini-1.5-flash, gemini-1.5-pro"}
                 {data.provider === "openai" && "Try: gpt-4o, gpt-4-turbo, gpt-3.5-turbo"}
                 {data.provider === "ollama" && "Try: llama3, mistral, phi3"}
                 {data.provider === "mock" && "Any name works for mock testing"}

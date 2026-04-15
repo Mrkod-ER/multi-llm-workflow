@@ -55,9 +55,10 @@ async def list_gemini_models() -> List[Dict[str, Any]]:
         return []
 
     return [
-        {"id": "gemini-1.5-flash", "provider": "gemini", "description": "Fast & efficient"},
-        {"id": "gemini-1.5-pro",   "provider": "gemini", "description": "Most capable"},
-        {"id": "gemini-2.0-flash", "provider": "gemini", "description": "Latest generation"},
+        {"id": "gemini-2.5-flash",       "provider": "gemini", "description": "Latest & fastest (free tier)"},
+        {"id": "gemini-2.0-flash",       "provider": "gemini", "description": "Stable generation 2"},
+        {"id": "gemini-1.5-flash",       "provider": "gemini", "description": "Fast & efficient"},
+        {"id": "gemini-1.5-pro",         "provider": "gemini", "description": "Most capable gen 1.5"},
     ]
 
 
